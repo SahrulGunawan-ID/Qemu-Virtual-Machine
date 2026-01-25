@@ -1,0 +1,46 @@
+name: Windows Download ARM64
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch: # Tambahkan ini agar tombol "Run workflow" muncul
+
+jobs:
+  build-windows-package:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🚀 Installing Tools ...
+      run: |
+        sudo apt update
+        sudo apt install p7zip-full wget -y
+
+    - name: 🌐 Downloading Windows Files
+      run: |
+        # Mengunduh file OVA
+        wget "https://dn710009.ca.archive.org/0/items/virtual-box/Windows%20XP.ova" -O Windows_XP.ova
+        
+        # Ekstrak file OVA
+        7z x Windows_XP.ova
+        
+        # Mengompresi file yang ada di dalam OVA (Pastikan nama file sesuai)
+        # Gunakan 'a' untuk add, dan tanda kutip untuk nama file berspasi
+        7z a "Windows_Disk.7z" -mx9 "Windows XP-disk001.vmdk" || echo "File vmdk tidak ditemukan"
+        7z a "Windows_ISO.7z" -mx9 "Windows XP-disk002.iso" || echo "File iso tidak ditemukan"
+
+    - name: 📦 Prepare Release Package
+      run: |
+        mkdir -p release_files
+        [ -f Windows_Disk.7z ] && mv Windows_Disk.7z release_files/
+        [ -f Windows_ISO.7z ] && mv Windows_ISO.7z release_files/
+        tar -czvf windows_arm64_package.tar.gz -C release_files .
+
+    - name: 💾 Upload to GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Windows ARM64 Download
+        tag_name: windows-v${{ github.run_number }}
+        files: windows_arm64_package.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
