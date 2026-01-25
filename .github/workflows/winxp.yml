@@ -18,7 +18,7 @@ jobs:
     - name: 🌐 Downloading Windows Files
       run: |
         # Mengunduh file OVA
-        wget "https://dn710009.ca.archive.org/0/items/virtual-box/Windows%20XP.ova" -O Windows_XP.ova
+        curl "https://dn710009.ca.archive.org/0/items/virtual-box/Windows%20XP.ova" -o Windows_XP.ova
         
         # Ekstrak file OVA
         7z x Windows_XP.ova
