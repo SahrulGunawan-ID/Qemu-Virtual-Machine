@@ -21,7 +21,7 @@ jobs:
         wget "https://dn710009.ca.archive.org/0/items/virtual-box/Windows%20XP.ova" -O Windows_XP.ova
         
         # Ekstrak file OVA
-        7z x Windows_XP.ova
+        tar xvf Windows_XP.ova
         
         # Mengompresi file yang ada di dalam OVA (Pastikan nama file sesuai)
         # Gunakan 'a' untuk add, dan tanda kutip untuk nama file berspasi
