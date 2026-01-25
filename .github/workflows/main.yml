@@ -1,0 +1,47 @@
+name: Windows Download X86
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build-windows-package:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🚀 Installing Tools ...
+      run: |
+        sudo apt update
+        sudo apt install p7zip-full -y
+
+    - name: 🌐 Downloading Windows Files
+      run: |
+        # Mengunduh file OVA
+        wget "https://dn710009.ca.archive.org/0/items/virtual-box/Windows%20XP.ova" -O Windows_XP.ova
+        
+        # Ekstrak file OVA
+        7z x Windows_XP.ova
+        
+        # Kompresi ulang bagian-bagian tertentu sesuai instruksi Anda
+        # Catatan: Pastikan nama file di dalam OVA sesuai (case sensitive)
+        7z a Windows_Disk.7z -mx9 'Windows XP-disk001.vmdk'
+        7z a Windows_ISO.7z -mx9 'Windows XP-disk002.iso'
+
+    - name: 📦 Prepare Release Package
+      run: |
+        mkdir -p release_files
+        mv Windows_Disk.7z release_files/
+        mv Windows_ISO.7z release_files/
+        tar -czvf windows_X86_package.tar.gz -C release_files .
+
+    - name: 💾 Upload to GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Windows X86 Download
+        tag_name: windows-v1.0
+        files: windows_X86_package.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 🗂️ Verify Package
+      run: ls -lh windows_X86_package.tar.gz
